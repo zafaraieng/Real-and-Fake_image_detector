@@ -35,7 +35,7 @@ Source: [Kaggle – birdy654/cifake-real-and-ai-generated-synthetic-images](http
 | Train | 50 000 | 50 000 | 100 000 |
 | Test  | 10 000 | 10 000 | 20 000  |
 
-Images are resized to **96 × 96** for the lightweight training regime used in this work. The official train/test split is respected; no test images are used for training or model selection.
+Images are resized to **96 × 96** for the lightweight training regime used in this work. The official test split is reserved for final evaluation. The notebook creates a deterministic 10% validation holdout from the official training split for checkpoint and threshold selection.
 
 **Important:** Do not commit the dataset or Kaggle credentials. Download the dataset yourself using a personal Kaggle API token (never hard-code keys).
 
@@ -68,19 +68,17 @@ flowchart LR
 | Device               | CUDA when available            |
 | Augmentations        | Albumentations pipeline        |
 
-Exact training and evaluation commands, full hyperparameter lists, and measured metrics will be expanded as experiment logs are consolidated.
+The notebook uses a deterministic 90/10 split of the official training data for training and validation. The official 20,000-image test split is used only after checkpoint selection. Threshold selection is performed on validation data; test metrics use the selected threshold or a fixed 0.5 threshold as explicitly labeled.
 
 ## Results Status
 
-The notebook states an expected accuracy range of approximately **97–98 %** under the described lightweight regime.  
-**Final measured metrics (accuracy, precision, recall, F1, ROC-AUC, parameter count, latency) must be taken from the actual evaluation cell outputs of a completed run.**  
-Until those numbers are extracted and verified from a clean run, treat published figures as provisional.
+**No verified held-out test metrics are currently published.** Earlier notebook runs selected checkpoints and tuned thresholds against the official test split, so those reported figures are not independent held-out estimates and should not be cited as unbiased results. The revised notebook now reserves the official test split for final evaluation, but it must be rerun from a clean runtime before any new metric is reported.
 
 A proper results table, confusion matrix, ROC curve, and ablation notes will be added once verified experimental artifacts are available.
 
 ## Limitations
 
-- Evaluation is currently limited to the CIFake test split; external dataset generalization has not yet been reported.
+- The revised notebook separates training, validation, and official held-out test data. A fresh end-to-end run is still required to produce valid final metrics. External dataset generalization has not yet been reported.
 - 96 × 96 resolution discards fine-grained detail that larger models may exploit.
 - No adversarial robustness or out-of-distribution analysis is included in the present version.
 - Model weights and full experiment logs are not yet packaged for one-click reproduction.
@@ -106,7 +104,7 @@ source .venv/bin/activate   # or Windows equivalent
 pip install -r requirements.txt   # to be added
 
 # Kaggle credentials (never commit these)
-# Place kaggle.json in ~/.kaggle/ or set KAGGLE_USERNAME / KAGGLE_KEY as environment variables
+# The notebook prompts you to upload kaggle.json into the runtime
 
 # Open the research notebook
 jupyter notebook notebooks/Real\&Fake_image_detector.ipynb
